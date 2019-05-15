@@ -23,6 +23,7 @@ conan_basic_setup()''')
 
     def build(self):
         cmake = CMake(self)
+        cmake.definitions["OPENVDB_ROOT"] = self.deps_cpp_info["OpenVDB"].rootpath
         cmake.configure(source_folder="{}/openvdb-points-unity".format(self.source_folder))
         cmake.build()
 
