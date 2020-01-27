@@ -9,7 +9,7 @@ class OpenvdbpointsunityConan(ConanFile):
     description = "<Description of Openvdbpointsunity here>"
     settings = "os", "compiler", "build_type", "arch"
     options = {"shared": [True, False]}
-    requires = ("OpenVDB/6.0.0@jromphf/stable",)
+    requires = ("OpenVDB/7.0.0@jromphf/stable",)
     default_options = "shared=False"
     generators = "cmake"
 
@@ -19,11 +19,12 @@ class OpenvdbpointsunityConan(ConanFile):
         tools.replace_in_file("{}/openvdb-points-unity/CMakeLists.txt".format(self.source_folder), "PROJECT(openvdb-points-unity)",
                               '''PROJECT(openvdb-points-unity)
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-conan_basic_setup()''')
+conan_basic_setup(KEEP_RPATHS)''')
 
     def build(self):
         cmake = CMake(self)
         cmake.definitions["OPENVDB_ROOT"] = self.deps_cpp_info["OpenVDB"].rootpath
+        cmake.definitions["OPENVDB_MODULE_DIR"] = "{}/lib".format(self.deps_cpp_info["OpenVDB"].rootpath)
         cmake.configure(source_folder="{}/openvdb-points-unity".format(self.source_folder))
         cmake.build(target="install")
 
