@@ -73,7 +73,7 @@ conan_basic_setup()''')
     def remove_redundant_dependencies(self):
         library = "{}/lib/libopenvdb-points-unity.dylib".format(self.build_folder)
         dependencies = self.list_linked_dependencies(library)
-        # for dependency in dependencies:
+        # remove dependencies not in list
 
     def package_info(self):
         self.cpp_info.libs = ["openvdb-points-unity"]
