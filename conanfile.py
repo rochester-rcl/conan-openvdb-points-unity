@@ -2,6 +2,7 @@ from conans import ConanFile, CMake, tools
 import os
 from macholib import mach_o, MachO
 
+
 class OpenvdbpointsunityConan(ConanFile):
     name = "OpenVDBPointsUnity"
     version = "0.0.1"
@@ -30,7 +31,6 @@ conan_basic_setup()''')
         cmake.definitions["OPENVDB_MODULE_DIR"] = "{}/lib".format(self.deps_cpp_info["OpenVDB"].rootpath)
         cmake.configure(source_folder="{}/openvdb-points-unity".format(self.source_folder))
         cmake.build(target="install")
-        self.set_osx_rpaths()
 
     # TODO will make this more organized once prototyping is done
     def package(self):
@@ -44,14 +44,13 @@ conan_basic_setup()''')
     def imports(self):
         if self.settings.os == 'Macos':
             self.copy("*.dylib", dst="lib", keep_path=False)
-            self.set_osx_rpaths()
+            # self.set_osx_rpaths()
         if self.settings.os == 'Windows':
             self.copy("*.dll", dst="lib", keep_path=False)
-        # need to figure out what windows and linux are (i.e. "Windows")
+            # need to figure out what windows and linux are (i.e. "Windows")
 
     @staticmethod
     def list_linked_dependencies(library):
-
         def get_dependencies(library_path):
             m = MachO.MachO(library_path)
             deps = []
@@ -61,20 +60,20 @@ conan_basic_setup()''')
                         dep = data.decode('ascii')
                         dep = dep.rstrip('\x00')
                         if '/' not in dep:
-                            deps.append(dep)
-            return deps
+                            deps.append("{}/{}".format(os.path.dirname(library), dep))
+            if len(deps) > 0:
+                children = [get_dependencies(dep) for dep in deps]
+                all_deps = deps + [dep for child in children for dep in child]
+                return set(all_deps)
+            else:
+                return []
+
         return get_dependencies(library)
 
-    def set_osx_rpaths(self):
+    def remove_redundant_dependencies(self):
         library = "{}/lib/libopenvdb-points-unity.dylib".format(self.build_folder)
-
-
-        for dirname, dirnames, filenames in os.walk("{}/lib".format(self.build_folder)):
-            for filename in filenames:
-                pass
-
-    def get_osx_dependencies(self):
-        print(self.cpp_info.lib_dirs)
+        dependencies = self.list_linked_dependencies(library)
+        # for dependency in dependencies:
 
     def package_info(self):
         self.cpp_info.libs = ["openvdb-points-unity"]
