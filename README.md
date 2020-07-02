@@ -7,7 +7,7 @@
 ```bash
 git clone https://github.com/rochester-rcl/conan-openvdb-points-unity.git
 cd conan-openvdb-points-unity
-git submodule init
+git submodule update --init
 dependencies/./build_all.sh
 ```
 #### To Build Library
@@ -36,5 +36,5 @@ Once the library has been built, go to the directory of your choice and deploy t
 conan install OpenVDBPointsUnity/0.0.1@rcldsl/stable
 ```
 
-This should result in the creation of a folder titled OpenVDBPointsUnity containing the library and its dependencies. This can be dropped into MyUnityProject/Assets/Plugins folder
+This should result in the creation of a folder titled OpenVDBPointsUnity containing the library and its dependencies. Copy the contents of this folder into the necessary platform folder in MyUnityProject/Assets/Plugins
 
