@@ -2,6 +2,7 @@ from conans import ConanFile, CMake, tools
 import os
 from macholib import mach_o, MachO
 import subprocess
+import shutil
 
 class OpenvdbpointsunityConan(ConanFile):
     name = "OpenVDBPointsUnity"
@@ -73,6 +74,14 @@ class OpenvdbpointsunityConan(ConanFile):
         self.copy("*.so", dst="OpenVDBPointsUnity", keep_path=False)
         self.copy("*.a", dst="OpenVDBPointsUnity", keep_path=False)
         self.copy("*.dll", dst="OpenVDBPointsUnity", keep_path=False)
+        src_lib = "OpenVDBPointsUnity/libopenvdb-points-unity.dylib"
+        dst_lib = "OpenVDBPointsUnity/libopenvdb-points-unity.bundle"
+        cwd = os.getcwd()
+        src = os.path.join(cwd, src_lib)
+        dst = os.path.join(cwd, dst_lib)
+        # Unity won't load a dylib https://answers.unity.com/questions/23615/how-to-make-unity-find-dylib-files.html
+        shutil.copy(src, dst)
+
 
     @staticmethod
     def list_linked_dependencies(library):
