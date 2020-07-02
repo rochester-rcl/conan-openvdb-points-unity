@@ -1,0 +1,12 @@
+[submodule "dependencies/conan-openexr"]
+	path = dependencies/conan-openexr
+	url = https://github.com/rochester-rcl/conan-openexr.git
+[submodule "dependencies/conan-openvdb"]
+	path = dependencies/conan-openvdb
+	url = https://github.com/rochester-rcl/conan-openvdb.git
+[submodule "dependencies/conan-ilmbase"]
+	path = dependencies/conan-ilmbase
+	url = https://github.com/rochester-rcl/conan-ilmbase.git
+[submodule "dependencies/conan-blosc"]
+	path = dependencies/conan-blosc
+	url = https://github.com/rochester-rcl/conan-blosc.git

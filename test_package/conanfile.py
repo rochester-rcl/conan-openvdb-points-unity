@@ -18,6 +18,7 @@ class OpenvdbpointsunityTestConan(ConanFile):
         self.copy("*.dll", dst="bin", src="bin")
         self.copy("*.dylib*", dst="bin", src="lib")
         self.copy('*.so*', dst='bin', src='lib')
+        self.copy("*.h", dst="include", src='include')
 
     def test(self):
         self.run("cd bin && .{}testPackage".format(os.sep))
