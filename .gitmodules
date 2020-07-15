@@ -1,12 +1,23 @@
 [submodule "dependencies/conan-openexr"]
 	path = dependencies/conan-openexr
 	url = https://github.com/rochester-rcl/conan-openexr.git
+	update = rebase
+	branch = master
 [submodule "dependencies/conan-openvdb"]
 	path = dependencies/conan-openvdb
 	url = https://github.com/rochester-rcl/conan-openvdb.git
+	update = rebase
+	branch = master
 [submodule "dependencies/conan-ilmbase"]
 	path = dependencies/conan-ilmbase
 	url = https://github.com/rochester-rcl/conan-ilmbase.git
+	branch = master
+	update = rebase
 [submodule "dependencies/conan-blosc"]
 	path = dependencies/conan-blosc
 	url = https://github.com/rochester-rcl/conan-blosc.git
+	update = rebase
+	branch = master
+[submodule "conan-ilmbase"]
+	branch = master
+	update = rebase

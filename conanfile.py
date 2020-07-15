@@ -49,9 +49,11 @@ class OpenvdbpointsunityConan(ConanFile):
     # TODO will make this more organized once prototyping is done
     def package(self):
         dependencies = [os.path.basename(dep) for dep in self.get_dependencies()]
+        if self.settings.os == "Macos":
+            self.fix_rpaths()
         for dependency in dependencies:
             self.copy(dependency, src="lib", dst="lib")
-
+        # Fix rpaths on OSX
         self.copy(
             "*.h",
             dst="include",
@@ -83,11 +85,25 @@ class OpenvdbpointsunityConan(ConanFile):
         shutil.copy(src, dst)
 
 
+    def fix_rpaths(self):
+        library = "{}/lib/libopenvdb-points-unity.dylib".format(self.build_folder)
+        files = list(self.get_dependencies())
+        files.append(library)
+        basenames = [os.path.basename(f) for f in files] + list(self.list_linked_rpaths(library))
+        for f in files:
+            for b in basenames:
+                cmd = ["install_name_tool", "-change", b, "@loader_path/{}".format(os.path.basename(b)), f]
+                subprocess.call(cmd)
+
+    def list_linked_rpaths(self, library):
+        return self.list_linked_dependencies(library, True)
+
     @staticmethod
-    def list_linked_dependencies(library):
-        def get_dependencies(library_path):
+    def list_linked_dependencies(library, rpaths_only=False):
+        def get_dependencies(library_path, rpaths_only):
             m = MachO.MachO(library_path)
             deps = []
+            rpaths = []
             for header in m.headers:
                 for load_command, dylib_command, data in header.commands:
                     if load_command.cmd == mach_o.LC_LOAD_DYLIB:
@@ -95,14 +111,21 @@ class OpenvdbpointsunityConan(ConanFile):
                         dep = dep.rstrip("\x00")
                         if "/" not in dep:
                             deps.append("{}/{}".format(os.path.dirname(library), dep))
+                        if "@rpath/" in dep:
+                            rpaths.append(dep)
+                            deps.append("{}/{}".format(os.path.dirname(library), os.path.basename(dep)))
             if len(deps) > 0:
-                children = [get_dependencies(dep) for dep in deps]
+                children = [get_dependencies(dep, False) for dep in deps]
+                rpath_children = [get_dependencies(dep, True) for dep in deps]
                 all_deps = deps + [dep for child in children for dep in child]
+                all_rpaths = rpaths + [rpath for child in rpath_children for rpath in child]
+                if rpaths_only:
+                    return set(all_rpaths)
                 return set(all_deps)
             else:
                 return []
 
-        return get_dependencies(library)
+        return get_dependencies(library, rpaths_only)
 
     def get_dependencies(self):
         library = "{}/lib/libopenvdb-points-unity.dylib".format(self.build_folder)
